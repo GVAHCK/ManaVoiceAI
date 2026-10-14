@@ -1,0 +1,75 @@
+version: '3.8'
+
+services:
+  mongodb:
+    image: mongo:7.0
+    container_name: manavoice-mongo
+    restart: unless-stopped
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongo-data:/data/db
+    healthcheck:
+      test: ["CMD", "mongosh", "--eval", "db.adminCommand('ping')"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: manavoice-backend
+    restart: unless-stopped
+    depends_on:
+      mongodb:
+        condition: service_healthy
+    environment:
+      - APP_NAME=ManaVoice AI
+      - ENVIRONMENT=production
+      - DEBUG=false
+      - API_PREFIX=/api/v1
+      - MONGODB_URI=mongodb://mongodb:27017
+      - MONGODB_DATABASE=manavoice_ai
+      - JWT_SECRET_KEY=mana_voice_production_jwt_secret_antigravity_token_2026
+      - JWT_ACCESS_TOKEN_MINUTES=60
+      - JWT_REFRESH_TOKEN_DAYS=7
+      - FRONTEND_ORIGINS=http://localhost:5173,http://localhost:80,http://localhost:3000
+      - TTS_PROVIDER=transformers
+      - TTS_MODEL_DEFAULT=facebook/mms-tts-eng
+      - DEVICE=cpu
+      - HF_HOME=/root/.cache/huggingface
+      - TRANSLATION_PROVIDER=libretranslate
+      - LIBRETRANSLATE_URL=http://libretranslate:5000
+      - STORAGE_PROVIDER=local
+      - AUDIO_STORAGE_DIR=/app/storage/audio
+    ports:
+      - "8000:8000"
+    volumes:
+      - audio-data:/app/storage/audio
+      - hf-cache:/root/.cache/huggingface
+
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    container_name: manavoice-frontend
+    restart: unless-stopped
+    depends_on:
+      - backend
+    ports:
+      - "5173:80"
+
+  libretranslate:
+    image: libretranslate/libretranslate:latest
+    container_name: manavoice-translate
+    restart: unless-stopped
+    ports:
+      - "5000:5000"
+    environment:
+      - LT_LOAD_ONLY=en,es,fr,de,hi,te
+
+volumes:
+  mongo-data:
+  audio-data:
+  hf-cache:
