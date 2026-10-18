@@ -20,6 +20,7 @@ if "sklearn" not in sys.modules:
     sys.modules["sklearn.metrics"] = mm
 
 import torch
+import numpy as np
 import soundfile as sf
 from transformers.models.vits import VitsModel, VitsTokenizer
 
@@ -105,10 +106,14 @@ class TTSEngine:
         # Check if model exists in memory or in huggingface hub cache
         if model_id in self._models:
             return True
-        hub_dir = Path.home() / ".cache" / "huggingface" / "hub"
         sanitized = f"models--{model_id.replace('/', '--')}"
-        model_path = hub_dir / sanitized
-        return model_path.exists()
+        # Check both configured HF_HOME and default home cache
+        candidate_dirs = [
+            Path(settings.HF_HOME) / "hub",
+            Path(settings.HF_HOME),
+            Path.home() / ".cache" / "huggingface" / "hub",
+        ]
+        return any((d / sanitized).exists() for d in candidate_dirs)
 
     def _load_model(self, model_id: str):
         if model_id not in self._models:
@@ -133,6 +138,18 @@ class TTSEngine:
         if not lang_info:
             raise ValueError(f"Language '{target_lang}' is not supported for speech synthesis.")
 
+        clean_text = (text or "").strip()
+        if not any(c.isalnum() for c in clean_text):
+            logger.info("Text contains no alphanumeric characters; generating 0.5s neutral silence.")
+            sample_rate = 16000
+            waveform = np.zeros(int(sample_rate * 0.5), dtype=np.float32)
+            buffer = io.BytesIO()
+            sf.write(buffer, waveform, sample_rate, format="WAV")
+            wav_bytes = buffer.getvalue()
+            duration = 0.5
+            storage_key, file_size = storage_service.save_audio_bytes(wav_bytes, format="wav")
+            return storage_key, duration, sample_rate, file_size
+
         resolved_model_id = model_id or lang_info["model_id"]
 
         async with self._semaphore:
@@ -145,7 +162,7 @@ class TTSEngine:
                     raise RuntimeError(f"Model loading error for {resolved_model_id}: {str(e)}")
 
             def _inference():
-                inputs = tokenizer(text, return_tensors="pt").to(self.device)
+                inputs = tokenizer(clean_text, return_tensors="pt").to(self.device)
                 with torch.no_grad():
                     output = model(**inputs)
                     waveform = output.waveform[0].cpu().numpy()

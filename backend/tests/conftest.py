@@ -1,6 +1,13 @@
+import os
+os.environ["OPENBLAS_NUM_THREADS"] = "1"
+os.environ["MKL_NUM_THREADS"] = "1"
+os.environ["NUMEXPR_NUM_THREADS"] = "1"
+os.environ["OMP_NUM_THREADS"] = "1"
+
 import pytest
 import pytest_asyncio
 import sys
+
 import types
 import importlib.machinery
 from httpx import AsyncClient, ASGITransport

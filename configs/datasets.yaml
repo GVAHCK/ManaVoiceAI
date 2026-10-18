@@ -1,0 +1,122 @@
+# ManaVoice AI — Verified Dataset Registry
+# Defines verified datasets for ASR, Translation, TTS, and Lip-Sync research & fine-tuning.
+
+version: "1.0.0"
+updated_at: "2026-10-18T14:45:00Z"
+
+datasets:
+  - id: "google-fleurs-multilingual"
+    name: "FLEURS Multilingual Speech Recognition"
+    provider: "google"
+    verified_identifier: "google/fleurs"
+    version: "1.0"
+    download_source: "kaggle"
+    task_type: "asr"
+    languages: ["en", "hi", "te", "ta", "kn", "ml", "bn", "mr", "es", "fr", "de"]
+    license: "CC-BY 4.0"
+    required_credentials: "kaggle_api"
+    approximate_size_mb: 450
+    download_status: "registered"
+    local_path: "storage/datasets/fleurs"
+    train_val_test_split:
+      train_pct: 80
+      val_pct: 10
+      test_pct: 10
+    preprocessing:
+      - "resample_16000_mono"
+      - "trim_silence"
+      - "normalize_unicode_text"
+      - "remove_corrupted_audio"
+    citation: "Conneau et al., FLEURS: Few-shot Learning Evaluation of Universal Representations of Speech, 2022"
+
+  - id: "mozilla-common-voice-multilingual"
+    name: "Mozilla Common Voice Speech Dataset"
+    provider: "mozilla"
+    verified_identifier: "mozillaorg/common-voice"
+    version: "13.0"
+    download_source: "kaggle"
+    task_type: "asr"
+    languages: ["en", "hi", "te", "ta", "mr", "es", "fr", "de"]
+    license: "CC0 1.0"
+    required_credentials: "kaggle_api"
+    approximate_size_mb: 1200
+    download_status: "registered"
+    local_path: "storage/datasets/common_voice"
+    train_val_test_split:
+      train_pct: 80
+      val_pct: 10
+      test_pct: 10
+    preprocessing:
+      - "validate_audio_duration_3_to_15s"
+      - "resample_16000_mono"
+      - "filter_empty_transcripts"
+    citation: "Ardila et al., Common Voice: A Massively-Multilingual Speech Corpus, 2020"
+
+  - id: "indic-speech-corpus"
+    name: "IndicSpeech Indian Language Speech Dataset"
+    provider: "ai4bharat"
+    verified_identifier: "ai4bharat/indic-speech"
+    version: "2.0"
+    download_source: "kaggle"
+    task_type: "tts"
+    languages: ["hi", "te", "ta", "kn", "ml", "bn", "mr"]
+    license: "MIT"
+    required_credentials: "kaggle_api"
+    approximate_size_mb: 680
+    download_status: "registered"
+    local_path: "storage/datasets/indic_speech"
+    train_val_test_split:
+      train_pct: 85
+      val_pct: 10
+      test_pct: 5
+    preprocessing:
+      - "filter_speech_quality"
+      - "align_phonemes"
+      - "normalize_loudness_16lufs"
+    citation: "AI4Bharat IndicSpeech Collection, 2023"
+
+  - id: "multilingual-parallel-translation-corpus"
+    name: "Multilingual Parallel Dialogue & Subtitle Corpus"
+    provider: "opus"
+    verified_identifier: "opus/multilingual-subtitles"
+    version: "1.2"
+    download_source: "kaggle"
+    task_type: "translation"
+    languages: ["en", "es", "fr", "de", "hi", "te", "ta"]
+    license: "CC-BY-SA 4.0"
+    required_credentials: "none"
+    approximate_size_mb: 85
+    download_status: "registered"
+    local_path: "storage/datasets/parallel_translation"
+    train_val_test_split:
+      train_pct: 80
+      val_pct: 10
+      test_pct: 10
+    preprocessing:
+      - "deduplicate_sentence_pairs"
+      - "filter_length_ratio_0.5_to_2.0"
+      - "normalize_punctuation"
+    citation: "OPUS Parallel Subtitle Repository"
+
+  - id: "lrs3-audiovisual-lipsync"
+    name: "LRS3 Lip Reading Sentences (Visual Speech)"
+    provider: "oxford"
+    verified_identifier: "oxford/lrs3-ted-speech"
+    version: "1.0"
+    download_source: "kaggle"
+    task_type: "lipsync"
+    languages: ["en"]
+    license: "Research & Non-Commercial Academic"
+    required_credentials: "kaggle_api"
+    approximate_size_mb: 890
+    download_status: "registered"
+    local_path: "storage/datasets/lrs3_lipsync"
+    train_val_test_split:
+      train_pct: 70
+      val_pct: 15
+      test_pct: 15
+    preprocessing:
+      - "crop_face_and_mouth_region_96x96"
+      - "extract_mel_spectrogram_80_bands"
+      - "synchronize_25fps_video_16khz_audio"
+    citation: "Afouras et al., LRS3-TED: a large-scale dataset for visual speech recognition, 2018"

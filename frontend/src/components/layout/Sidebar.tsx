@@ -20,13 +20,17 @@ export const Sidebar: React.FC<SidebarProps> = ({ isOpen = true, onClose }) => {
 
   const navItems = [
     { name: 'Overview', path: '/dashboard', icon: 'bi-grid-1x2' },
+    { name: 'Video Localization', path: '/video-studio', icon: 'bi-camera-video' },
     { name: 'Speech Studio', path: '/studio', icon: 'bi-mic' },
     { name: 'Generation History', path: '/history', icon: 'bi-clock-history' },
     { name: 'Saved Audio', path: '/saved-audio', icon: 'bi-volume-up' },
+    { name: 'Dataset Hub & Kaggle', path: '/datasets', icon: 'bi-database' },
+    { name: 'Model Evaluation', path: '/evaluations', icon: 'bi-cpu' },
     { name: 'Usage Analytics', path: '/analytics', icon: 'bi-bar-chart' },
     { name: 'Languages & Voices', path: '/languages', icon: 'bi-globe' },
     { name: 'Account Settings', path: '/settings', icon: 'bi-gear' },
   ];
+
 
   return (
     <aside

@@ -17,6 +17,10 @@ import { SettingsPage } from './pages/SettingsPage';
 import { PrivacyPage } from './pages/PrivacyPage';
 import { TermsPage } from './pages/TermsPage';
 import { NotFoundPage } from './pages/NotFoundPage';
+import { VideoStudioPage } from './pages/VideoStudioPage';
+import { DatasetsPage } from './pages/DatasetsPage';
+import { EvaluationsPage } from './pages/EvaluationsPage';
+
 
 export const App: React.FC = () => {
   return (
@@ -38,13 +42,17 @@ export const App: React.FC = () => {
           }
         >
           <Route path="/dashboard" element={<DashboardPage />} />
+          <Route path="/video-studio" element={<VideoStudioPage />} />
           <Route path="/studio" element={<StudioPage />} />
           <Route path="/history" element={<HistoryPage />} />
           <Route path="/saved-audio" element={<SavedAudioPage />} />
+          <Route path="/datasets" element={<DatasetsPage />} />
+          <Route path="/evaluations" element={<EvaluationsPage />} />
           <Route path="/analytics" element={<AnalyticsPage />} />
           <Route path="/languages" element={<LanguagesPage />} />
           <Route path="/settings" element={<SettingsPage />} />
         </Route>
+
 
         {/* 404 & Redirects */}
         <Route path="/404" element={<NotFoundPage />} />

@@ -17,3 +17,6 @@ python-multipart>=0.0.9
 mongomock-motor>=0.0.30
 pytest>=8.0.0
 pytest-asyncio>=0.23.0
+kaggle>=2.2.0
+jiwer>=4.0.0
+sacrebleu>=2.6.0

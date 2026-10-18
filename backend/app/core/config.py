@@ -6,6 +6,13 @@ from pydantic_settings import BaseSettings
 # Build paths inside the project
 BASE_DIR = Path(__file__).resolve().parent.parent.parent
 
+def _resolve_default_storage() -> Path:
+    # If D:\ManaVoice_Data exists or D: drive has large capacity, prioritize it to protect C: drive
+    d_path = Path("D:/ManaVoice_Data")
+    if d_path.exists():
+        return d_path
+    return BASE_DIR / "storage"
+
 class Settings(BaseSettings):
     APP_NAME: str = "ManaVoice AI"
     ENVIRONMENT: str = "development"
@@ -30,7 +37,15 @@ class Settings(BaseSettings):
     TTS_PROVIDER: str = "transformers"
     TTS_MODEL_DEFAULT: str = "facebook/mms-tts-eng"
     DEVICE: str = "cpu"
-    HF_HOME: str = str(BASE_DIR / ".cache" / "huggingface")
+    HF_HOME: str = str(_resolve_default_storage() / "cache" / "huggingface")
+    TRANSFORMERS_CACHE: str = str(_resolve_default_storage() / "cache" / "huggingface" / "hub")
+    PIP_CACHE_DIR: str = str(_resolve_default_storage() / "cache" / "pip")
+    TORCH_HOME: str = str(_resolve_default_storage() / "cache" / "torch")
+
+    # Speech Recognition (ASR)
+    ASR_PROVIDER: str = "whisper"
+    ASR_MODEL_DEFAULT: str = "openai/whisper-large-v3-turbo"
+    ASR_DEVICE: str = "cpu"
 
     # Translation
     TRANSLATION_PROVIDER: str = "libretranslate"
@@ -38,14 +53,37 @@ class Settings(BaseSettings):
     LIBRETRANSLATE_API_KEY: str = ""
     TRANSLATION_TIMEOUT_SECONDS: int = 30
 
-    # Storage
-    STORAGE_PROVIDER: str = "local"
-    AUDIO_STORAGE_DIR: str = str(BASE_DIR / "storage" / "audio")
+    # Lip-Sync & Face Processing
+    LIPSYNC_ENABLED: bool = True
+    LIPSYNC_MODEL_ID: str = "wav2lip"
 
-    # Limits
-    MAX_TEXT_LENGTH: int = 3000
+    # Storage Paths & Volumes
+    STORAGE_PROVIDER: str = "local"
+    BASE_STORAGE_DIR: str = str(_resolve_default_storage())
+    AUDIO_STORAGE_DIR: str = str(Path(BASE_STORAGE_DIR) / "audio")
+    MEDIA_STORAGE_DIR: str = str(Path(BASE_STORAGE_DIR) / "media")
+    VIDEO_STORAGE_DIR: str = str(Path(BASE_STORAGE_DIR) / "video")
+    SUBTITLE_STORAGE_DIR: str = str(Path(BASE_STORAGE_DIR) / "subtitles")
+    DATASET_STORAGE_DIR: str = str(Path(BASE_STORAGE_DIR) / "datasets")
+    MODELS_STORAGE_DIR: str = str(Path(BASE_STORAGE_DIR) / "models")
+    SCRATCH_STORAGE_DIR: str = str(Path(BASE_STORAGE_DIR) / "scratch")
+
+
+    # Disk Space Protection
+    MIN_FREE_DISK_MB: int = 150  # Refuse downloads or large tasks if disk drops below this
+
+
+    # Kaggle Integration
+    KAGGLE_USERNAME: str = ""
+    KAGGLE_KEY: str = ""
+    DATASET_REGISTRY_PATH: str = str(BASE_DIR.parent / "configs" / "datasets.yaml")
+
+    # Media & Upload Limits
+    MAX_TEXT_LENGTH: int = 5000
+    MAX_MEDIA_FILE_SIZE_MB: int = 100
+    MAX_VIDEO_DURATION_SECONDS: int = 900
     MAX_CONCURRENT_GENERATIONS: int = 2
-    REQUEST_TIMEOUT_SECONDS: int = 120
+    REQUEST_TIMEOUT_SECONDS: int = 300
 
     @property
     def cors_origins(self) -> List[str]:
@@ -62,3 +100,4 @@ class Settings(BaseSettings):
     }
 
 settings = Settings()
+

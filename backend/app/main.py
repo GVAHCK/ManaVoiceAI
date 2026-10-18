@@ -21,7 +21,7 @@ from app.core.config import settings
 from app.core.logging import logger
 from app.db.mongodb import db_manager
 from app.db.indexes import create_indexes
-from app.api.routes import health, auth, users, languages, speech, history, dashboard, analytics, saved_audio
+from app.api.routes import health, auth, users, languages, speech, history, dashboard, analytics, saved_audio, localization, datasets, training, evaluations
 
 import time
 import uuid
@@ -133,6 +133,11 @@ app.include_router(history.router, prefix=settings.API_PREFIX)
 app.include_router(dashboard.router, prefix=settings.API_PREFIX)
 app.include_router(analytics.router, prefix=settings.API_PREFIX)
 app.include_router(saved_audio.router, prefix=settings.API_PREFIX)
+app.include_router(localization.router, prefix=settings.API_PREFIX)
+app.include_router(datasets.router, prefix=settings.API_PREFIX)
+app.include_router(training.router, prefix=settings.API_PREFIX)
+app.include_router(evaluations.router, prefix=settings.API_PREFIX)
+
 
 @app.get("/")
 async def root():
